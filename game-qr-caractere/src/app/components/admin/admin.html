@@ -1,0 +1,42 @@
+<div class="admin-container">
+
+  <div class="screen-content" *ngIf="estado() === 'login'">
+    <h2 class="title">Administrador</h2>
+
+    <div class="input-group">
+      <label>Senha de acesso</label>
+      <input
+        type="password"
+        [(ngModel)]="senhaDigitada"
+        (keyup.enter)="verificarSenha()"
+        placeholder="Digite a senha">
+    </div>
+
+    <p class="error-msg" *ngIf="loginError()">Acesso negado!</p>
+
+    <div class="actions">
+      <button class="btn-purple" (click)="verificarSenha()">ENTRAR</button>
+      <button class="btn-link" (click)="onVoltar.emit()">Voltar</button>
+    </div>
+  </div>
+
+  <div class="screen-content" *ngIf="estado() === 'config'">
+    <h2 class="title">Administrador</h2>
+
+    <div class="input-group">
+      <label>Palavra Secreta</label>
+      <input #novaPalavra type="text" placeholder="Ex: COELHO">
+    </div>
+
+    <button class="btn-purple" (click)="salvar(novaPalavra.value)">ADICIONAR</button>
+
+    <div class="preview-slots" *ngIf="novaPalavra.value">
+      <div class="mini-slot" *ngFor="let letra of novaPalavra.value.split('')">
+        {{ letra.toUpperCase() }}
+      </div>
+    </div>
+
+    <button class="btn-purple btn-exit" (click)="onVoltar.emit()">SAIR</button>
+  </div>
+
+</div>

@@ -1,0 +1,20 @@
+<div class="app-container">
+  <app-home
+    *ngIf="telaAtual() === 'home'"
+    (onNavegar)="irPara($event)">
+  </app-home>
+
+  <app-admin
+    *ngIf="telaAtual() === 'login' || telaAtual() === 'config'"
+    [estado]="telaAtual()"
+    (onLoginSucesso)="irPara('config')"
+    (onSalvar)="configurarPalavra($event)"
+    (onVoltar)="irPara('home')">
+  </app-admin>
+
+  <app-jogo
+    *ngIf="telaAtual() === 'jogo'"
+    [palavraSecreta]="palavraSecreta()"
+    (onSair)="irPara('home')">
+  </app-jogo>
+</div>

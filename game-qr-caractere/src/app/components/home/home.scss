@@ -1,0 +1,51 @@
+.home-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+
+  .selection-card {
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+
+  .title {
+    color: #1a4a5e;
+    font-size: 1.6rem;
+    font-weight: bold;
+    margin-bottom: 40px;
+    // Pequeno efeito de sombra suave para destacar no mapa
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+  }
+
+  .button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .btn-perfil {
+    width: 100%;
+    padding: 18px;
+    background-color: #add8e6; // Azul claro da imagem
+    color: #1a4a5e;
+    border: 2px solid #1a4a5e;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.98);
+      background-color: darken(#add8e6, 5%);
+    }
+
+    &:hover {
+      background-color: lighten(#add8e6, 2%);
+    }
+  }
+}

@@ -1,0 +1,221 @@
+// Paleta de cores baseada no design do aplicativo
+$map-blue: #add8e6;
+$dark-blue: #1a4a5e;
+$admin-purple: #800080;
+$scanner-yellow: #ffff00;
+$white: #ffffff;
+
+.jogo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 15px;
+  min-height: 80vh;
+
+  .header-card {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 20px;
+
+    .group-name {
+      background: $dark-blue;
+      color: $white;
+      padding: 8px 25px;
+      border-radius: 10px;
+      display: inline-block;
+      margin-bottom: 12px;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .challenge-info {
+      font-style: italic;
+      color: $dark-blue;
+      font-size: 0.8rem;
+      line-height: 1.3;
+      margin-bottom: 15px;
+      p { margin: 0; }
+    }
+
+    .hearts-container {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      min-height: 40px;
+    }
+
+    .label-palavra {
+      font-weight: bold;
+      color: $dark-blue;
+      margin-bottom: 8px;
+      text-transform: lowercase;
+    }
+
+    .word-slots {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px;
+
+      .slot {
+        width: 38px;
+        height: 44px;
+        background: $white;
+        border: 2px solid $dark-blue;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.4rem;
+        color: $dark-blue;
+        box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+
+        &.revealed {
+          background: rgba($white, 0.9);
+          border-color: $admin-purple;
+        }
+      }
+    }
+  }
+
+  // Estilização do Scanner e Borda Amarela (Telas 4, 5 e 6)
+  .scanner-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .scanner-frame {
+      position: relative;
+      width: 210px;
+      height: 210px;
+      border: 8px solid $scanner-yellow; // Borda amarela fiel à imagem
+      border-radius: 25px;
+      overflow: hidden;
+      background: #000;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+
+      ngx-scanner-qrcode {
+        height: 100%;
+        width: 100%;
+      }
+
+      // Placeholder quando a câmera está desligada
+      .camera-off-overlay {
+        position: absolute;
+        inset: 0;
+        background: #111;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: #777;
+        z-index: 5;
+        .camera-icon { font-size: 2.5rem; margin-bottom: 8px; }
+      }
+
+      // Overlay de Erro - O "X" Amarelo da Tela 6
+      .error-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba($scanner-yellow, 0.92);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        animation: quickFade 0.2s ease-out;
+
+        .big-x {
+          font-size: 8rem;
+          font-weight: 900;
+          color: $dark-blue;
+          line-height: 1;
+        }
+      }
+    }
+
+    // Botão de Ativação que resolve o bug Renderer2
+    .btn-activate-scanner {
+      margin-top: 15px;
+      padding: 12px 25px;
+      background: $admin-purple;
+      color: $white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 0 darken($admin-purple, 20%);
+
+      &:active {
+        transform: translateY(2px);
+        box-shadow: 0 2px 0 darken($admin-purple, 20%);
+      }
+    }
+  }
+
+  .footer-hint {
+    text-align: center;
+    p { color: $dark-blue; font-style: italic; margin-bottom: 15px; }
+    .btn-exit {
+      background: none;
+      border: none;
+      color: $dark-blue;
+      text-decoration: underline;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+
+  // Estilo do Modal de Game Over
+  .game-over-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+
+    .modal-card {
+      background: $white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      width: 85%;
+      max-width: 300px;
+
+      h2 { margin-top: 0; &.win { color: #28a745; } &.lose { color: #dc3545; } }
+
+      .modal-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 15px;
+
+        button {
+          padding: 12px;
+          border-radius: 8px;
+          border: none;
+          font-weight: bold;
+          cursor: pointer;
+          &.btn-restart { background: $admin-purple; color: white; }
+          &.btn-home { background: #eee; color: $dark-blue; }
+        }
+      }
+    }
+  }
+}
+
+@keyframes quickFade {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}

@@ -1,0 +1,254 @@
+// Variáveis de Estilo
+$primary: #673ab7;
+$success: #4caf50;
+$danger: #f44336;
+$dark: #212121;
+$light: #ffffff;
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  position: relative;
+
+  // Botão Configurar (Admin) - Fixo para não sumir no scroll
+  .btn-admin-toggle {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 25px;
+    background: $primary;
+    color: $light;
+    font-weight: bold;
+    font-size: 0.9rem;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    &:active { transform: scale(0.95); }
+  }
+
+  // Painel Administrativo (Overlay)
+  .admin-panel {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 20px;
+
+    .admin-content {
+      background: $light;
+      width: 100%;
+      max-width: 350px;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      animation: scaleIn 0.3s ease;
+
+      h3 { margin-top: 0; color: $dark; }
+      p { color: #666; font-size: 0.9rem; }
+
+      .input-group {
+        margin: 20px 0;
+        input {
+          width: 100%;
+          padding: 15px;
+          border: 2px solid #ddd;
+          border-radius: 12px;
+          font-size: 1.2rem;
+          text-align: center;
+          text-transform: uppercase;
+          &:focus { border-color: $primary; outline: none; }
+        }
+      }
+
+      .admin-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        button {
+          padding: 14px;
+          border: none;
+          border-radius: 10px;
+          font-weight: bold;
+          cursor: pointer;
+
+          &.btn-save { background: $primary; color: $light; }
+          &.btn-cancel { background: #eee; color: #666; }
+        }
+      }
+    }
+  }
+
+  // Cabeçalho e Vidas
+  .header {
+    text-align: center;
+    margin-top: 50px;
+    margin-bottom: 20px;
+
+    .lives-container {
+      font-size: 2rem;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      min-height: 40px;
+    }
+
+    .game-title {
+      color: $primary;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 1.5rem;
+      margin: 0;
+    }
+  }
+
+  // Scanner Wrapper
+  .scanner-wrapper {
+    width: 100%;
+    max-width: 350px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
+    ngx-scanner-qrcode {
+      height: 250px;
+      display: block;
+    }
+
+    .scanner-controls {
+      padding: 15px;
+      background: $light;
+
+      button {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-weight: bold;
+        background: $success;
+        color: $light;
+
+        &.btn-stop { background: $danger; }
+        &:disabled { opacity: 0.5; }
+      }
+    }
+  }
+
+  // Tabuleiro
+  .word-display {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+
+    .letter-box {
+      width: 45px;
+      height: 55px;
+      background: rgba($light, 0.6);
+      border-bottom: 4px solid #aaa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+      font-weight: 800;
+      color: transparent;
+      transition: all 0.3s ease;
+
+      &.active {
+        color: $dark;
+        background: $light;
+        border-bottom-color: $primary;
+        transform: translateY(-5px);
+      }
+    }
+  }
+
+  // Resultado Final
+  .game-over-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba($primary, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+
+    .message-card {
+      background: $light;
+      padding: 40px;
+      border-radius: 25px;
+      text-align: center;
+      width: 85%;
+      max-width: 320px;
+
+      h2 { font-size: 2rem; margin-top: 0; }
+      .win-text { color: $success; }
+      .lose-text { color: $danger; }
+
+      .btn-reset {
+        margin-top: 20px;
+        padding: 15px 30px;
+        background: $primary;
+        color: $light;
+        border: none;
+        border-radius: 30px;
+        font-weight: bold;
+        width: 100%;
+      }
+    }
+  }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.error-msg {
+  color: #f44336;
+  font-size: 0.8rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.app-container {
+  min-height: 100vh;
+  width: 100%;
+  // Cor azul clara com padrão de grade simulando o mapa da imagem
+  background-color: #add8e6;
+  background-image:
+    radial-gradient(#87ceeb 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px);
+  background-size: 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 50px;
+}

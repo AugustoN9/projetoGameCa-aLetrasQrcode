@@ -1,0 +1,42 @@
+<div class="jogo-container" *ngIf="isBrowser()">
+
+  <div class="header-card">
+    <h3 class="group-name">Os amigos</h3>
+
+    <div class="hearts-container">
+      <span *ngFor="let v of [].constructor(vidas())" class="heart">❤️</span>
+    </div>
+
+    <div class="word-slots">
+      <div class="slot" *ngFor="let letra of letrasDescobertas()" [class.revealed]="letra !== '_'">
+        {{ letra !== '_' ? letra : '' }}
+      </div>
+    </div>
+  </div>
+
+  <div class="scanner-section">
+    <div class="scanner-frame" style="border: 8px solid yellow; width: 220px; height: 220px; position: relative; background: #000;">
+
+      <ngx-scanner-qrcode
+        *ngIf="isCameraActive()"
+        #action="scanner"
+        (event)="handleEvent($event)"
+        [config]="config">
+      </ngx-scanner-qrcode>
+
+      <div class="camera-off-overlay" *ngIf="!isCameraActive()" style="color: white; text-align: center; padding: 20px;">
+        <p>Aguardando ativação...</p>
+      </div>
+
+      <div class="error-overlay" *ngIf="letraErradaDetectada()" style="position: absolute; inset: 0; background: yellow; display: flex; align-items: center; justify-content: center; z-index: 10;">
+        <span style="font-size: 80px; font-weight: bold; color: #1a4a5e;">X</span>
+      </div>
+    </div>
+
+    <button type="button" class="btn-activate" (click)="toggleCamera()" style="margin-top: 15px; padding: 10px 20px; background: purple; color: white; border-radius: 8px;">
+      {{ isCameraActive() ? 'DESLIGAR CÂMERA' : 'ATIVAR SCANNER' }}
+    </button>
+  </div>
+
+  <button class="btn-exit" (click)="onSair.emit()" style="margin-top: 20px; background: none; border: none; text-decoration: underline;">Sair</button>
+</div>
