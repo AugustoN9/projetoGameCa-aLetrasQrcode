@@ -1,40 +1,41 @@
 import { Component, OnInit, AfterViewInit, ViewChild, signal, ChangeDetectorRef, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
-  
   ScannerQRCodeConfig,
   ScannerQRCodeResult,
-  NgxScannerQrcodeComponent
+  NgxScannerQrcodeComponent // Versão 3.x utiliza o componente diretamente nos imports
 } from 'ngx-scanner-qrcode';
 
 @Component({
   selector: 'app-jogo',
   standalone: true,
-  imports: [CommonModule, NgxScannerQrcodeComponent],
+  imports: [
+    CommonModule,
+    NgxScannerQrcodeComponent // Importado como componente standalone
+  ],
   templateUrl: './jogo.html',
   styleUrl: './jogo.scss'
 })
 export class JogoComponent implements OnInit, AfterViewInit {
   private cdr = inject(ChangeDetectorRef);
-  private platformId = inject(PLATFORM_ID); // Proteção para SSR/Build
+  private platformId = inject(PLATFORM_ID); // Proteção contra erros de SSR/Build no Vercel
 
   @ViewChild('action') scanner!: NgxScannerQrcodeComponent;
 
-  // Signals de Estado
+  // Estados reativos com Angular Signals
   public isCameraActive = signal(false);
   public palavraSecreta = signal('GATO');
   public letrasDescobertas = signal<string[]>(['_', '_', '_', '_']);
   public vidas = signal(5);
   public letraErradaDetectada = signal(false);
 
-  // Configuração otimizada para o Note 10+
+  // Configuração otimizada para a câmera principal traseira
   public config: ScannerQRCodeConfig = {
     constraints: {
       video: {
         width: { ideal: 1280 },
         height: { ideal: 720 },
-        // 'environment' foca na câmera traseira principal
-        facingMode: { ideal: 'environment' }
+        facingMode: 'environment' // Foca na câmera traseira
       }
     }
   };
@@ -44,7 +45,7 @@ export class JogoComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {}
 
   public toggleCamera() {
-    // Garante que o hardware só seja acessado no navegador
+    // Garante que o código só execute no navegador (essencial para deploy Vercel)
     if (!isPlatformBrowser(this.platformId)) return;
 
     if (this.isCameraActive()) {
@@ -53,26 +54,25 @@ export class JogoComponent implements OnInit, AfterViewInit {
     } else {
       this.isCameraActive.set(true);
 
-      // Aumentamos o delay para 800ms. O Android 12 no Note 10+
-      // precisa de tempo para instanciar o componente via *ngIf antes do start()
+      // Aumentamos o delay para 1000ms para o Android 12 processar a permissão
+      // e o Angular renderizar o scanner após o clique no botão
       setTimeout(() => {
         if (this.scanner) {
           this.scanner.start().subscribe({
-            next: (res) => console.log('Câmera principal iniciada:', res),
+            next: (res) => console.log('Hardware iniciado:', res),
             error: (err) => {
-              console.warn('Falha ao abrir hardware:', err);
-              // Fallback caso o navegador bloqueie o acesso
+              console.error('Falha ao abrir câmera:', err);
               this.isCameraActive.set(false);
+              alert('Erro ao acessar a câmera. Verifique as permissões do navegador.');
             }
           });
         }
-      }, 800);
+      }, 1000);
     }
     this.cdr.detectChanges();
   }
 
   public handleEvent(e: ScannerQRCodeResult[]): void {
-    // A biblioteca retorna um array; pegamos o primeiro resultado válido
     if (!e || e.length === 0) return;
 
     const valorRaw = e[0].value;
@@ -82,10 +82,9 @@ export class JogoComponent implements OnInit, AfterViewInit {
   }
 
   private validarJogada(letraRaw: string) {
-    // Normalização: Remove espaços, converte para maiúsculo e remove acentos
+    // Normalização para garantir que espaços ou acentos não quebrem a lógica
     const letra = letraRaw.trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
-    // Impede o processamento se não for uma letra única ou se já foi descoberta
     if (!letra || letra.length !== 1 || this.letrasDescobertas().includes(letra)) return;
 
     const palavra = this.palavraSecreta().toUpperCase();
@@ -98,15 +97,13 @@ export class JogoComponent implements OnInit, AfterViewInit {
       this.letrasDescobertas.set(novoProgresso);
 
       if (!novoProgresso.includes("_")) {
-        // Vitória: Você pode emitir um som ou abrir um modal aqui
-        console.log('Palavra completa!');
+        console.log('Vitória!'); // Aqui você pode chamar seu modal de sucesso
       }
     } else {
-      // Lógica de erro
       this.vidas.update((v) => v - 1);
       this.letraErradaDetectada.set(true);
 
-      // O Signal letraErradaDetectada dispara a animação do "X" no HTML
+      // O overlay de erro (X) é controlado por este Signal
       setTimeout(() => this.letraErradaDetectada.set(false), 1500);
 
       if (this.vidas() <= 0) {
