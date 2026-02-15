@@ -240,13 +240,16 @@ input[type="password"] {
 .app-container {
   min-height: 100vh;
   width: 100%;
-  // Cor azul clara com padrão de grade simulando o mapa da imagem
+  // Cor azul clara baseada no seu design
   background-color: #add8e6;
+
+  // Correção da sintaxe do background: adicionado vírgulas e separado o background-size
   background-image:
-    radial-gradient(#87ceeb 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px);
-  background-size: 20px 20px;
+    url("../assets/jogoQrcodeMapa.png");
+
+  background-size: cover;
+
+  // Adicionado os ponto e vírgulas obrigatórios
   display: flex;
   justify-content: center;
   align-items: flex-start;
