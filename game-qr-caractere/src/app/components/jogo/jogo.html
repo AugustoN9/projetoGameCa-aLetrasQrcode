@@ -1,82 +1,38 @@
-<div class="jogo-container" *ngIf="isBrowser()">
-  <div class="header-card">
-    <h3 class="group-name">Os amigos</h3>
+<div class="container-jogo">
+  <h2>Descubra a Palavra</h2>
 
-    <div class="hearts-container">
-      <span *ngFor="let v of [].constructor(vidas())" class="heart">❤️</span>
-    </div>
-
-    <div class="word-slots">
-      <div class="slot" *ngFor="let letra of letrasDescobertas()" [class.revealed]="letra !== '_'">
-        {{ letra !== '_' ? letra : '' }}
-      </div>
-    </div>
+  <div class="vidas-info">
+    <p>Vidas: <strong>{{ vidas() }}</strong></p>
   </div>
 
-  <div class="scanner-section">
-    <div
-      class="scanner-frame"
-      style="
-        border: 8px solid yellow;
-        width: 220px;
-        height: 220px;
-        position: relative;
-        background: #000;
-      "
-    >
+  <div class="palavra-display">
+    <span *ngFor="let letra of letrasDescobertas()" class="letra-slot">
+      {{ letra }}
+    </span>
+  </div>
+
+  <div class="scanner-container">
+    <div class="moldura-amarela">
+
       <ngx-scanner-qrcode
         *ngIf="isCameraActive()"
         #action="scanner"
-        (event)="handleEvent($event)"
         [config]="config"
-      >
+        (event)="handleEvent($any($event))">
       </ngx-scanner-qrcode>
 
-      <!-- <div class="camera-off-overlay" *ngIf="!isCameraActive()" style="color: white; text-align: center; padding: 20px;">
-        <p>Aguardando ativação...</p>
-      </div> -->
-      <button (click)="toggleCamera()">
-        {{ isCameraActive() ? 'Parar' : 'Ativar Scanner' }}
-      </button>
-
-      <div
-        class="error-overlay"
-        *ngIf="letraErradaDetectada()"
-        style="
-          position: absolute;
-          inset: 0;
-          background: yellow;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10;
-        "
-      >
-        <span style="font-size: 80px; font-weight: bold; color: #1a4a5e">X</span>
+      <div *ngIf="!isCameraActive()" class="placeholder-camera">
+        <p>Câmera Desligada</p>
       </div>
-    </div>
 
-    <button
-      type="button"
-      class="btn-activate"
-      (click)="toggleCamera()"
-      style="
-        margin-top: 15px;
-        padding: 10px 20px;
-        background: purple;
-        color: white;
-        border-radius: 8px;
-      "
-    >
-      {{ isCameraActive() ? 'DESLIGAR CÂMERA' : 'ATIVAR SCANNER' }}
-    </button>
+      <div *ngIf="letraErradaDetectada()" class="erro-overlay">
+        <span>X</span>
+      </div>
+
+    </div>
   </div>
 
-  <button
-    class="btn-exit"
-    (click)="onSair.emit()"
-    style="margin-top: 20px; background: none; border: none; text-decoration: underline"
-  >
-    Sair
+  <button class="btn-primary" (click)="toggleCamera()">
+    {{ isCameraActive() ? 'DESLIGAR CÂMERA' : 'ATIVAR SCANNER' }}
   </button>
 </div>
