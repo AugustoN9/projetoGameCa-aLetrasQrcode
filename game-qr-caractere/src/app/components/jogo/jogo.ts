@@ -35,7 +35,7 @@ export class JogoComponent implements OnInit, AfterViewInit {
       video: {
         width: { ideal: 1280 },
         height: { ideal: 720 },
-        facingMode: 'environment' // Foca na câmera traseira
+       facingMode: { exact: 'environment' } // Foca na câmera traseira
       }
     }
   };
