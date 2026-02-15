@@ -8,27 +8,27 @@ import {
   AfterViewInit,
   PLATFORM_ID,
   inject,
-  ChangeDetectorRef
-} from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+  ChangeDetectorRef,
+} from "@angular/core";
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import {
   NgxScannerQrcodeComponent,
   ScannerQRCodeResult,
-  ScannerQRCodeConfig
-} from 'ngx-scanner-qrcode';
+  ScannerQRCodeConfig,
+} from "ngx-scanner-qrcode";
 
 @Component({
-  selector: 'app-jogo',
+  selector: "app-jogo",
   standalone: true,
   imports: [CommonModule, NgxScannerQrcodeComponent],
-  templateUrl: './jogo.html',
-  styleUrl: './jogo.scss'
+  templateUrl: "./jogo.html",
+  styleUrl: "./jogo.scss",
 })
 export class JogoComponent implements OnInit, AfterViewInit {
   private platformId = inject(PLATFORM_ID);
   private cdr = inject(ChangeDetectorRef);
 
-  @ViewChild('action') scanner!: NgxScannerQrcodeComponent;
+  @ViewChild("action") scanner!: NgxScannerQrcodeComponent;
 
   palavraSecreta = input.required<string>();
   onSair = output<void>();
@@ -44,9 +44,9 @@ export class JogoComponent implements OnInit, AfterViewInit {
     constraints: {
       video: {
         width: { ideal: 480 },
-        facingMode: 'environment'
-      }
-    }
+        facingMode: "environment",
+      },
+    },
   };
 
   ngOnInit() {
@@ -60,7 +60,7 @@ export class JogoComponent implements OnInit, AfterViewInit {
   }
 
   private inicializarTabuleiro() {
-    const slots = Array(this.palavraSecreta().length).fill('_');
+    const slots = Array(this.palavraSecreta().length).fill("_");
     this.letrasDescobertas.set(slots);
   }
 
@@ -69,23 +69,29 @@ export class JogoComponent implements OnInit, AfterViewInit {
    * O scanner só é iniciado após o clique no botão.
    */
   public toggleCamera() {
-    if (!this.scanner) return;
+    if (this.isCameraActive()) {
+      this.scanner?.stop();
+      this.isCameraActive.set(false);
+    } else {
+      this.isCameraActive.set(true);
 
-    try {
-      if (this.isCameraActive()) {
-        this.scanner.stop();
-        this.isCameraActive.set(false);
-      } else {
-        this.scanner.start(); // Inicia o scanner em um contexto de evento seguro
-        this.isCameraActive.set(true);
-      }
-    } catch (error) {
-      console.error('Erro ao acessar câmera:', error);
+      // O setTimeout é crucial para dar tempo ao Angular de renderizar a tag <ngx-scanner-qrcode>
+      // antes de tentarmos acessar o método .start() via @ViewChild
+      setTimeout(() => {
+        if (this.scanner) {
+          this.scanner.start().subscribe({
+            next: (res) => console.log("Câmera iniciada:", res),
+            error: (err) => console.error("Erro ao ligar hardware:", err),
+          });
+        }
+      }, 200); // 200ms é um tempo seguro para o Note 10+ processar o DOM
     }
+    this.cdr.detectChanges();
   }
 
   public handleEvent(event: ScannerQRCodeResult[]): void {
-    if (!event?.length || this.jogoFinalizado() || this.letraErradaDetectada()) return;
+    if (!event?.length || this.jogoFinalizado() || this.letraErradaDetectada())
+      return;
 
     const valorLido = event[0].value?.toUpperCase().trim();
     if (valorLido && valorLido.length === 1) {
@@ -104,11 +110,11 @@ export class JogoComponent implements OnInit, AfterViewInit {
       }
       this.letrasDescobertas.set(novoProgresso);
 
-      if (!novoProgresso.includes('_')) {
+      if (!novoProgresso.includes("_")) {
         this.encerrar();
       }
     } else {
-      this.vidas.update(v => v - 1);
+      this.vidas.update((v) => v - 1);
       this.letraErradaDetectada.set(true);
       setTimeout(() => this.letraErradaDetectada.set(false), 1500);
 

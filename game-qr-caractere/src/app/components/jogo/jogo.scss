@@ -37,7 +37,9 @@ $white: #ffffff;
       font-size: 0.8rem;
       line-height: 1.3;
       margin-bottom: 15px;
-      p { margin: 0; }
+      p {
+        margin: 0;
+      }
     }
 
     .hearts-container {
@@ -74,7 +76,7 @@ $white: #ffffff;
         font-weight: bold;
         font-size: 1.4rem;
         color: $dark-blue;
-        box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
 
         &.revealed {
           background: rgba($white, 0.9);
@@ -100,11 +102,18 @@ $white: #ffffff;
       border-radius: 25px;
       overflow: hidden;
       background: #000;
-      box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 
       ngx-scanner-qrcode {
-        height: 100%;
-        width: 100%;
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+
+        video {
+          object-fit: cover; // Garante que o vídeo preencha o quadrado amarelo
+          width: 100% !important;
+          height: 100% !important;
+        }
       }
 
       // Placeholder quando a câmera está desligada
@@ -118,7 +127,10 @@ $white: #ffffff;
         align-items: center;
         color: #777;
         z-index: 5;
-        .camera-icon { font-size: 2.5rem; margin-bottom: 8px; }
+        .camera-icon {
+          font-size: 2.5rem;
+          margin-bottom: 8px;
+        }
       }
 
       // Overlay de Erro - O "X" Amarelo da Tela 6
@@ -164,7 +176,11 @@ $white: #ffffff;
 
   .footer-hint {
     text-align: center;
-    p { color: $dark-blue; font-style: italic; margin-bottom: 15px; }
+    p {
+      color: $dark-blue;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
     .btn-exit {
       background: none;
       border: none;
@@ -179,7 +195,7 @@ $white: #ffffff;
   .game-over-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -193,7 +209,15 @@ $white: #ffffff;
       width: 85%;
       max-width: 300px;
 
-      h2 { margin-top: 0; &.win { color: #28a745; } &.lose { color: #dc3545; } }
+      h2 {
+        margin-top: 0;
+        &.win {
+          color: #28a745;
+        }
+        &.lose {
+          color: #dc3545;
+        }
+      }
 
       .modal-buttons {
         display: flex;
@@ -207,8 +231,14 @@ $white: #ffffff;
           border: none;
           font-weight: bold;
           cursor: pointer;
-          &.btn-restart { background: $admin-purple; color: white; }
-          &.btn-home { background: #eee; color: $dark-blue; }
+          &.btn-restart {
+            background: $admin-purple;
+            color: white;
+          }
+          &.btn-home {
+            background: #eee;
+            color: $dark-blue;
+          }
         }
       }
     }
@@ -216,6 +246,12 @@ $white: #ffffff;
 }
 
 @keyframes quickFade {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
