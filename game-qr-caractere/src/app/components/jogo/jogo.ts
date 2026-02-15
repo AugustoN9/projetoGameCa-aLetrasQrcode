@@ -43,10 +43,14 @@ export class JogoComponent implements OnInit, AfterViewInit {
   public config: ScannerQRCodeConfig = {
     constraints: {
       video: {
-        width: { ideal: 480 },
+        width: { ideal: 1280 }, // Aumentamos a resolução para maior clareza
+        height: { ideal: 720 },
         facingMode: { exact: "environment" },
       },
     },
+    canvasStyles: [
+      { lineWidth: 1, strokeStyle: "#ffff00", fillStyle: "#ffff00" }, // Borda amarela no código lido
+    ],
   };
 
   ngOnInit() {
@@ -109,23 +113,52 @@ export class JogoComponent implements OnInit, AfterViewInit {
     }
   }
 
-  private validarJogada(letra: string) {
-    if (this.letrasDescobertas().includes(letra)) return;
-    const palavra = this.palavraSecreta();
+  private validarJogada(letraRaw: string) {
+    // 1. Normalização: remove espaços e garante que seja apenas a letra pura
+    const letra = letraRaw
+      .trim()
+      .toUpperCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+    // Impede processamento se não for uma letra válida ou se já foi descoberta
+    if (
+      !letra ||
+      letra.length !== 1 ||
+      this.letrasDescobertas().includes(letra)
+    )
+      return;
+
+    const palavra = this.palavraSecreta()
+      .toUpperCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
     if (palavra.includes(letra)) {
       const novoProgresso = [...this.letrasDescobertas()];
-      for (let i = 0; i < palavra.length; i++) {
-        if (palavra[i] === letra) novoProgresso[i] = letra;
-      }
-      this.letrasDescobertas.set(novoProgresso);
+      let houveAcerto = false;
 
-      if (!novoProgresso.includes("_")) {
-        this.encerrar();
+      for (let i = 0; i < palavra.length; i++) {
+        if (palavra[i] === letra) {
+          novoProgresso[i] = letra;
+          houveAcerto = true;
+        }
+      }
+
+      if (houveAcerto) {
+        this.letrasDescobertas.set(novoProgresso);
+
+        // Checa vitória
+        if (!novoProgresso.includes("_")) {
+          this.encerrar();
+        }
       }
     } else {
+      // Só penaliza se a letra já não foi tentada como errada (opcional)
       this.vidas.update((v) => v - 1);
       this.letraErradaDetectada.set(true);
+
+      // O som de erro ou vibração poderia entrar aqui
       setTimeout(() => this.letraErradaDetectada.set(false), 1500);
 
       if (this.vidas() <= 0) {
