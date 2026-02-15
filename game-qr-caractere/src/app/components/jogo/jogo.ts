@@ -44,7 +44,7 @@ export class JogoComponent implements OnInit, AfterViewInit {
     constraints: {
       video: {
         width: { ideal: 480 },
-        facingMode: "environment",
+        facingMode: { exact: "environment" },
       },
     },
   };
@@ -64,10 +64,6 @@ export class JogoComponent implements OnInit, AfterViewInit {
     this.letrasDescobertas.set(slots);
   }
 
-  /**
-   * ESTA FUNÇÃO RESOLVE O ERRO RENDERER2
-   * O scanner só é iniciado após o clique no botão.
-   */
   public toggleCamera() {
     if (this.isCameraActive()) {
       this.scanner?.stop();
@@ -75,16 +71,30 @@ export class JogoComponent implements OnInit, AfterViewInit {
     } else {
       this.isCameraActive.set(true);
 
-      // O setTimeout é crucial para dar tempo ao Angular de renderizar a tag <ngx-scanner-qrcode>
-      // antes de tentarmos acessar o método .start() via @ViewChild
       setTimeout(() => {
         if (this.scanner) {
           this.scanner.start().subscribe({
-            next: (res) => console.log("Câmera iniciada:", res),
-            error: (err) => console.error("Erro ao ligar hardware:", err),
+            next: () => console.log("Câmera traseira iniciada"),
+            error: (err) => {
+              console.warn("Erro no modo exact, tentando modo flexível", err);
+
+              // Correção para o VS Code: Reinicializamos o objeto de forma segura
+              this.config = {
+                ...this.config,
+                constraints: {
+                  ...this.config.constraints,
+                  video: {
+                    width: { ideal: 480 },
+                    facingMode: "environment", // Fallback flexível
+                  },
+                },
+              };
+
+              this.scanner.start();
+            },
           });
         }
-      }, 200); // 200ms é um tempo seguro para o Note 10+ processar o DOM
+      }, 300);
     }
     this.cdr.detectChanges();
   }
