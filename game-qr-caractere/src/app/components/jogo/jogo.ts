@@ -1,7 +1,7 @@
-import { Component, OnInit, AfterViewInit, ViewChild, signal, ChangeDetectorRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Essencial para o *ngIf
+import { Component, OnInit, AfterViewInit, ViewChild, signal, ChangeDetectorRef, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
-  NgxScannerQrcodeModule,
+  
   ScannerQRCodeConfig,
   ScannerQRCodeResult,
   NgxScannerQrcodeComponent
@@ -10,12 +10,13 @@ import {
 @Component({
   selector: 'app-jogo',
   standalone: true,
-  imports: [CommonModule, NgxScannerQrcodeModule], // CommonModule declarado aqui
+  imports: [CommonModule, NgxScannerQrcodeComponent],
   templateUrl: './jogo.html',
   styleUrl: './jogo.scss'
 })
 export class JogoComponent implements OnInit, AfterViewInit {
   private cdr = inject(ChangeDetectorRef);
+  private platformId = inject(PLATFORM_ID); // Proteção para SSR/Build
 
   @ViewChild('action') scanner!: NgxScannerQrcodeComponent;
 
@@ -26,43 +27,52 @@ export class JogoComponent implements OnInit, AfterViewInit {
   public vidas = signal(5);
   public letraErradaDetectada = signal(false);
 
-  // Configuração para o Note 10+
+  // Configuração otimizada para o Note 10+
   public config: ScannerQRCodeConfig = {
     constraints: {
       video: {
         width: { ideal: 1280 },
         height: { ideal: 720 },
-        facingMode: { exact: 'environment' }
+        // 'environment' foca na câmera traseira principal
+        facingMode: { ideal: 'environment' }
       }
     }
   };
 
   ngOnInit() {}
+
   ngAfterViewInit() {}
 
   public toggleCamera() {
+    // Garante que o hardware só seja acessado no navegador
+    if (!isPlatformBrowser(this.platformId)) return;
+
     if (this.isCameraActive()) {
       this.scanner?.stop();
       this.isCameraActive.set(false);
     } else {
       this.isCameraActive.set(true);
+
+      // Aumentamos o delay para 800ms. O Android 12 no Note 10+
+      // precisa de tempo para instanciar o componente via *ngIf antes do start()
       setTimeout(() => {
         if (this.scanner) {
           this.scanner.start().subscribe({
-            next: (res) => console.log('Câmera iniciada:', res),
+            next: (res) => console.log('Câmera principal iniciada:', res),
             error: (err) => {
-              console.warn('Erro modo exact, tentando flexível', err);
-              this.config = { ...this.config, constraints: { video: { facingMode: 'environment' } } };
-              this.scanner.start();
+              console.warn('Falha ao abrir hardware:', err);
+              // Fallback caso o navegador bloqueie o acesso
+              this.isCameraActive.set(false);
             }
           });
         }
-      }, 400);
+      }, 800);
     }
     this.cdr.detectChanges();
   }
 
   public handleEvent(e: ScannerQRCodeResult[]): void {
+    // A biblioteca retorna um array; pegamos o primeiro resultado válido
     if (!e || e.length === 0) return;
 
     const valorRaw = e[0].value;
@@ -72,8 +82,10 @@ export class JogoComponent implements OnInit, AfterViewInit {
   }
 
   private validarJogada(letraRaw: string) {
+    // Normalização: Remove espaços, converte para maiúsculo e remove acentos
     const letra = letraRaw.trim().toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
+    // Impede o processamento se não for uma letra única ou se já foi descoberta
     if (!letra || letra.length !== 1 || this.letrasDescobertas().includes(letra)) return;
 
     const palavra = this.palavraSecreta().toUpperCase();
@@ -86,15 +98,19 @@ export class JogoComponent implements OnInit, AfterViewInit {
       this.letrasDescobertas.set(novoProgresso);
 
       if (!novoProgresso.includes("_")) {
-        alert('Parabéns! Você descobriu a palavra!');
+        // Vitória: Você pode emitir um som ou abrir um modal aqui
+        console.log('Palavra completa!');
       }
     } else {
+      // Lógica de erro
       this.vidas.update((v) => v - 1);
       this.letraErradaDetectada.set(true);
+
+      // O Signal letraErradaDetectada dispara a animação do "X" no HTML
       setTimeout(() => this.letraErradaDetectada.set(false), 1500);
 
       if (this.vidas() <= 0) {
-        alert('Fim de jogo! Tente novamente.');
+        console.log('Game Over');
       }
     }
   }

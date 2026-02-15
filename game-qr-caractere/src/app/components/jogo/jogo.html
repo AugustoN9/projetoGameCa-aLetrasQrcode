@@ -1,18 +1,29 @@
-<div class="container-jogo">
-  <h2>Descubra a Palavra</h2>
+<div class="jogo-container">
+  <div class="header-card">
+    <div class="group-name">OS AMIGOS</div>
 
-  <div class="vidas-info">
-    <p>Vidas: <strong>{{ vidas() }}</strong></p>
+    <div class="challenge-info">
+      <p>Encontre as letras espalhadas</p>
+      <p>e complete a palavra secreta!</p>
+    </div>
+
+    <div class="hearts-container">
+      <span *ngFor="let i of [].constructor(vidas())">❤️</span>
+    </div>
+
+    <p class="label-palavra">palavra:</p>
+
+    <div class="word-slots">
+      <div *ngFor="let letra of letrasDescobertas()"
+           class="slot"
+           [class.revealed]="letra !== '_'">
+        {{ letra }}
+      </div>
+    </div>
   </div>
 
-  <div class="palavra-display">
-    <span *ngFor="let letra of letrasDescobertas()" class="letra-slot">
-      {{ letra }}
-    </span>
-  </div>
-
-  <div class="scanner-container">
-    <div class="moldura-amarela">
+  <div class="scanner-section">
+    <div class="scanner-frame">
 
       <ngx-scanner-qrcode
         *ngIf="isCameraActive()"
@@ -21,18 +32,23 @@
         (event)="handleEvent($any($event))">
       </ngx-scanner-qrcode>
 
-      <div *ngIf="!isCameraActive()" class="placeholder-camera">
+      <div *ngIf="!isCameraActive()" class="camera-off-overlay">
+        <span class="camera-icon">📷</span>
         <p>Câmera Desligada</p>
       </div>
 
-      <div *ngIf="letraErradaDetectada()" class="erro-overlay">
-        <span>X</span>
+      <div *ngIf="letraErradaDetectada()" class="error-overlay">
+        <span class="big-x">X</span>
       </div>
-
     </div>
+
+    <button class="btn-activate-scanner" (click)="toggleCamera()">
+      {{ isCameraActive() ? 'Desligar Câmera' : 'Ativar Scanner' }}
+    </button>
   </div>
 
-  <button class="btn-primary" (click)="toggleCamera()">
-    {{ isCameraActive() ? 'DESLIGAR CÂMERA' : 'ATIVAR SCANNER' }}
-  </button>
+  <div class="footer-hint">
+    <p>Aponte para um QR Code!</p>
+    <button class="btn-exit">Sair do Grupo</button>
+  </div>
 </div>
